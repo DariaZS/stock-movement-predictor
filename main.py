@@ -1,5 +1,6 @@
 import sys
 
+import matplotlib.pyplot as plt
 import pandas as pd
 import yfinance as yf
 
@@ -21,23 +22,20 @@ def fetch_stock_data(ticker, start_date, end_date):
         sys.exit(1)
     return data
 
-# Example: Fetch Apple stock data from last year
-'''
-if __name__ == '__main__':
-    ticker = 'AAPL'
-    start_date = '2023-01-01'
-    end_date = '2024-01-01'
-
-    print(f"Fetching stock data for {ticker} from {start_date} to {end_date}")
-    stock_data = fetch_stock_data(ticker, start_date, end_date)
-
-    # Save data to a CSV file
-    stock_data.to_csv(f"data/{ticker}_stock_data.csv")
-
-    print(f"✅ Stock data saved to data/{ticker}_stock_data.csv")
-    print(stock_data.head()) # Display first few rows of data
-
-'''
+def plot_stock_data(ticker, stock_data):
+    """
+    Plot the closing stock price overtime.
+    :param ticker: Stock ticker symbol
+    :param stock_data: DataFrame containing stock data
+    """
+    plt.figure(figsize = ( 10, 5 ))
+    plt.plot(stock_data.index, stock_data['Close'], label = f"{ticker} Closing Price")
+    plt.xlabel('Date')
+    plt.ylabel('Price (USD)')
+    plt.title(f"{ticker} Stock Price Over Time")
+    plt.legend()
+    plt.grid()
+    plt.show()
 
 if __name__ == '__main__':
     tickers_input = input("Enter the ticker symbols, comma-separated, e.g. APPL, TSLA, GOOGL: ").strip()
@@ -55,7 +53,9 @@ if __name__ == '__main__':
             stock_data.to_csv(csv_filename)
 
             print(f"✅ Data saved to {csv_filename}")
-            print(stock_data.head())
+            
+            # Plot the stock data
+            plot_stock_data(ticker, stock_data)
         except ValueError as ve:
             print(f"❌ Invalid date format: {ve}")
         except Exception as e:
