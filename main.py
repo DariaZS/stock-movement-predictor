@@ -40,22 +40,24 @@ if __name__ == '__main__':
 '''
 
 if __name__ == '__main__':
-    ticker = input("Enter the ticker symbol: ").strip().upper()
+    tickers_input = input("Enter the ticker symbols, comma-separated, e.g. APPL, TSLA, GOOGL: ").strip()
     start_date = input("Enter the start date (YYYY-MM-DD): ").strip()
     end_date = input("Enter the end date (YYYY-MM-DD): ").strip()
 
-    print(f"Fetching stock data for {ticker} from {start_date} to {end_date}")
+    tickers = [ticker.strip() for ticker in tickers_input.split(",")]
+    print(f"Fetching stock data for {', '.join(tickers)} from {start_date} to {end_date}")
 
-    try:
-        stock_data = fetch_stock_data(ticker, start_date, end_date)
-        # Save data to CSV
-        csv_filename = f"data/{ticker}_stock_data.csv"
-        stock_data.to_csv(csv_filename)
+    for ticker in tickers:
+        try:
+            stock_data = fetch_stock_data(ticker, start_date, end_date)
+            # Save data to CSV
+            csv_filename = f"data/{ticker}_stock_data.csv"
+            stock_data.to_csv(csv_filename)
 
-        print(f"✅ Data saved to {csv_filename}")
-        print(stock_data.head())
-    except ValueError as ve:
-        print(f"❌ Invalid date format: {ve}")
-    except Exception as e:
-        print(f"❌ Error fetching stock data: {e}")
+            print(f"✅ Data saved to {csv_filename}")
+            print(stock_data.head())
+        except ValueError as ve:
+            print(f"❌ Invalid date format: {ve}")
+        except Exception as e:
+            print(f"❌ Error fetching stock data: {e}")
         
