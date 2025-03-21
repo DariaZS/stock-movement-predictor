@@ -11,10 +11,10 @@ This project predicts stock price movement using historical data and sentiment a
 Run the following command to install dependencies:
 ```bash
 pip isntall -r requirements.txt
-
+```
 
 ## 🏁 Usage
 ```bash
 python main.py
-
+```
 
