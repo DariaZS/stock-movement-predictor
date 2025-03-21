@@ -1,3 +1,5 @@
+import sys
+
 import pandas as pd
 import yfinance as yf
 
@@ -13,9 +15,14 @@ def fetch_stock_data(ticker, start_date, end_date):
     """
     stock = yf.Ticker(ticker)
     data = stock.history(start = start_date, end = end_date)
+    
+    if data.empty:
+        print(f"❌ No data found for {ticker}! Check the ticker symbol and dates.")
+        sys.exit(1)
     return data
 
 # Example: Fetch Apple stock data from last year
+'''
 if __name__ == '__main__':
     ticker = 'AAPL'
     start_date = '2023-01-01'
@@ -30,4 +37,25 @@ if __name__ == '__main__':
     print(f"✅ Stock data saved to data/{ticker}_stock_data.csv")
     print(stock_data.head()) # Display first few rows of data
 
-    
+'''
+
+if __name__ == '__main__':
+    ticker = input("Enter the ticker symbol: ").strip().upper()
+    start_date = input("Enter the start date (YYYY-MM-DD): ").strip()
+    end_date = input("Enter the end date (YYYY-MM-DD): ").strip()
+
+    print(f"Fetching stock data for {ticker} from {start_date} to {end_date}")
+
+    try:
+        stock_data = fetch_stock_data(ticker, start_date, end_date)
+        # Save data to CSV
+        csv_filename = f"data/{ticker}_stock_data.csv"
+        stock_data.to_csv(csv_filename)
+
+        print(f"✅ Data saved to {csv_filename}")
+        print(stock_data.head())
+    except ValueError as ve:
+        print(f"❌ Invalid date format: {ve}")
+    except Exception as e:
+        print(f"❌ Error fetching stock data: {e}")
+        
