@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
+import plotly.graph_objects as go
 import streamlit as st
 import yfinance as yf
 
@@ -32,26 +33,28 @@ if st.button("Fetch & Plot"):
             data_dict[ticker] = df
 
             # Individual Plot
-            st.subheader(f"{ticker} Price + MAs")
-            fig, ax = plt.subplots(figsize=(10, 4))
-            ax.plot(df.index, df['Close'], label='Close')
-            ax.plot(df.index, df['MA7'], linestyle='--', label='7-Day MA')
-            ax.plot(df.index, df['MA30'], linestyle='--', label='30-Day MA')
-            ax.set_xlabel("Date")
-            ax.set_ylabel("Price")
-            ax.legend()
-            ax.grid(True)
-            st.pyplot(fig)
+            st.subheader(f"{ticker} Price + Moving Averages (Interactive)")
+
+            fig = go.Figure()
+            fig.add_trace(go.Scatter(x=df.index, y=df['Close'], mode='lines', name='Close'))
+            fig.add_trace(go.Scatter(x=df.index, y=df['MA7'], mode='lines', name='7-Day MA'))
+            fig.add_trace(go.Scatter(x=df.index, y=df['MA30'], mode='lines', name='30-Day MA'))
+
+            fig.update_layout(title=f"{ticker} Stock Price", xaxis_title="Date", yaxis_title="Price", hovermode="x unified")
+
+            st.plotly_chart(fig, use_container_width=True)
+
+
+
 
             # Volatility Plot
-            st.subheader(f"{ticker} Volatility")
-            fig2, ax2 = plt.subplots(figsize=(10, 3))
-            ax2.plot(df.index, df['Volatility'], color='red', label='30-Day Volatility')
-            ax2.set_xlabel("Date")
-            ax2.set_ylabel("Volatility")
-            ax2.legend()
-            ax2.grid(True)
-            st.pyplot(fig2)
+            st.subheader(f"{ticker} Volatility (Interactive)")
+
+            fig2 = go.Figure()
+            fig2.add_trace(go.Scatter(x=df.index, y=df['Volatility'], mode='lines', name='30-Day Volatility', line=dict(color='red')))
+            fig2.update_layout(title=f"{ticker} Rolling Volatility", xaxis_title="Date", yaxis_title="Volatility", hovermode="x unified")
+
+            st.plotly_chart(fig2, use_container_width=True)
 
             # CSV Download button
             csv = df.to_csv(index = True).encode('utf-8')
