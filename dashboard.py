@@ -53,6 +53,15 @@ if st.button("Fetch & Plot"):
             ax2.grid(True)
             st.pyplot(fig2)
 
+            # CSV Download button
+            csv = df.to_csv(index = True).encode('utf-8')
+            st.download_button(
+                label=f"📥 Download {ticker} data as CSV",
+                data = csv,
+                file_name=f"{ticker}_stock_data.csv",
+                mime='text/csv',
+            )
+
         except Exception as e:
             st.error(f"Error fetching data for {ticker}: {e}")
 
