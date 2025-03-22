@@ -70,14 +70,17 @@ if st.button("Fetch & Plot"):
 
     # Multi-Stock Comparison Plot
     if len(data_dict) > 1:
-        st.subheader("📊 Normalized Stock Comparison")
-        fig, ax = plt.subplots(figsize=(12, 5))
-        for t, d in data_dict.items():
-            norm = d["Close"] / d["Close"].iloc[0] * 100
-            ax.plot(d.index, norm, label=t)
-        ax.set_title("Normalized Closing Prices (Start = 100)")
-        ax.set_xlabel("Date")
-        ax.set_ylabel("Normalized Price")
-        ax.legend()
-        ax.grid(True)
-        st.pyplot(fig)
+        # 🔥 Interactive Multi-Stock Normalized Price Chart
+        st.subheader("📊 Multi-Stock Comparison (Normalized Prices)")
+
+        fig = go.Figure()
+        for ticker, df in data_dict.items():
+            norm = df['Close'] / df['Close'].iloc[0]
+            fig.add_trace(go.Scatter(x=df.index, y=norm, mode='lines', name=ticker))
+
+        fig.update_layout(title="Normalized Price Comparison",
+                    xaxis_title="Date",
+                    yaxis_title="Normalized Price",
+                    hovermode="x unified")
+
+        st.plotly_chart(fig, use_container_width=True)
