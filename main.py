@@ -1,8 +1,12 @@
 import sys
 
+import logging
+logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] %(message)s')
 import matplotlib.pyplot as plt
 import pandas as pd
 import yfinance as yf
+
+from src.ml_model import create_features, make_prediction, train_model
 
 
 # Function to get stock data
@@ -14,13 +18,17 @@ def fetch_stock_data(ticker, start_date, end_date):
     :param end_date: End date for historical data (format: 'YYYY-MM-DD')
     :return: DataFrame containing stock prices
     """
+    logging.info(f"Fetching data for {ticker} from {start_date} to {end_date}")
     stock = yf.Ticker(ticker)
-    data = stock.history(start = start_date, end = end_date)
     
-    if data.empty:
-        print(f"❌ No data found for {ticker}! Check the ticker symbol and dates.")
-        sys.exit(1)
-    return data
+    try:
+        data = stock.history(start = start_date, end = end_date)
+        if data.empty:
+            raise ValueError(f"No data found for {ticker}")
+        return data
+    except Exception as e:
+        logging.error(f"❌ Error fetching data for {ticker}")
+        return None
 
 def plot_stock_data(ticker, df):
     """
@@ -88,22 +96,48 @@ if __name__ == '__main__':
     end_date = input("Enter the end date (YYYY-MM-DD): ").strip()
 
     tickers = [ticker.strip() for ticker in tickers_input.split(",")]
-    print(f"Fetching stock data for {', '.join(tickers)} from {start_date} to {end_date}") 
-
+    print("🟢 Application started.")
+    print(f"Tickers to fetch: {tickers}")
+    print(f"Date range: {start_date} to {end_date}")
+    
     for ticker in tickers:
         try:
             stock_data = fetch_stock_data(ticker, start_date, end_date)
+            if stock_data is None:
+                print(f"Skipping ticker {ticker} due to fetch error.")
+                continue
             # Save data to CSV
             csv_filename = f"data/{ticker}_stock_data.csv"
             stock_data.to_csv(csv_filename)
-
-            print(f"✅ Data saved to {csv_filename}")
             
+            print(f"✅ Data saved to {csv_filename}")
+            print(f"📊 Plotting stock data for {ticker}...")
+
+
             # Store for multi-stock comparison
             stock_data_dict[ticker] = stock_data
 
             # Plot individual stock data
             plot_stock_data(ticker, stock_data)
+
+            # ----ML prediction-----NewBlock
+            print(f"Training model for {ticker}...")
+
+            # Create features and labels
+            print("🤖 Running prediction module (ML)...")
+            X, y = create_features(stock_data)
+            model, scaler, score = train_model(X, y)
+            print(f"Model accuracy for {ticker}: {score: .2f}")
+
+            latest_features = X.iloc[[-1]]
+            prediction = make_prediction(model, scaler, latest_features)
+            direction = "📈 UP" if prediction[0] == 1 else "📉 DOWN"
+            print(f"Prediction movement for {ticker}: {direction}")
+
+
+
+
+
         except ValueError as ve:
             print(f"❌ Invalid date format: {ve}")
         except Exception as e:
