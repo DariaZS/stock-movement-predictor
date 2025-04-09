@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 import yfinance as yf
+from src.ml_model import create_features, train_model, make_prediction
 
 st.set_page_config(page_title="📈 Stock Dashboard", layout="wide")
 
@@ -67,7 +68,22 @@ if st.button("Fetch & Plot"):
 
         except Exception as e:
             st.error(f"Error fetching data for {ticker}: {e}")
+        
+        
+        # ---- ML Prediction Section ----
+        st.subheader(f"🤖 ML Prediction for {ticker} ")
+        st.markdown("---")
+        try:
+            X, y = create_features(df)
+            model, scaler, acc = train_model(X, y)
+            latest_features = X.iloc[[-1]]
+            pred = make_prediction(model, scaler, latest_features)
 
+            direction = "📈 UP" if pred[0] == 1 else "📉 DOWN"
+            st.success(f"Prediction for {ticker}: {direction}")
+            st.caption(f"Model Accuracy: {acc:.2f}")
+        except Exception as e:
+            st.error(f"Prediction failed for {ticker}: {e}")
     # Multi-Stock Comparison Plot
     if len(data_dict) > 1:
         # 🔥 Interactive Multi-Stock Normalized Price Chart

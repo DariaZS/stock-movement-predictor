@@ -1,4 +1,5 @@
 # 📈 Stock Movement Predictor
+⚠️ This is an early-stage version. I’m actively tuning the ML model for improved predictive accuracy.
 
 This project predicts stock price movement using historical data and sentiment analysis.
 
