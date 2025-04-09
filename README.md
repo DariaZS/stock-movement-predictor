@@ -1,3 +1,5 @@
+[![Streamlit App](https://img.shields.io/badge/Live%20App-Streamlit-brightgreen)](https://dariazs-stock-movement-predictor-dashboard-idfn8r.streamlit.app)
+
 # 📈 Stock Movement Predictor
 ⚠️ This is an early-stage version. I’m actively tuning the ML model for improved predictive accuracy.
 
